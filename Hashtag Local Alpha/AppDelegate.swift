@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Firebase
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -14,8 +15,41 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
 
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions:
+        [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+
+        FirebaseApp.configure()
+      
+       Auth.auth().addStateDidChangeListener { auth, user in
+            
+          let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            
+           if user != nil {
+            
+                
+             FirebaseUser.observeHashtagProfile(user!.uid) { hashtagProfile in
+                    FirebaseUser.currentFirebaseUser = hashtagProfile
+                print(hashtagProfile?.uid)
+                }
+                //
+                let controller = storyboard.instantiateViewController(withIdentifier: "MainScreenController") as! UITableViewController
+                self.window?.rootViewController = controller
+                self.window?.makeKeyAndVisible()
+            } else {
+            print("nouser")
+                
+                
+               // FirebaseUser.currentFirebaseUser = nil
+                
+                // menu screen
+                let controller = storyboard.instantiateViewController(withIdentifier: "ViewController") as! ViewController
+                self.window?.rootViewController = controller
+                self.window?.makeKeyAndVisible()
+            }
+        }
+        
+   
+       
         return true
     }
 
